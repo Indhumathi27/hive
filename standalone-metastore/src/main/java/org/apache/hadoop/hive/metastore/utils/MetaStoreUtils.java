@@ -723,6 +723,11 @@ public class MetaStoreUtils {
     for (FileStatus status : fileStatus) {
       // don't take directories into account for quick stats TODO: wtf?
       if (!status.isDir()) {
+        String storageHandler = params.get("storage_handler");
+        if (storageHandler != null && storageHandler.contains("CarbonStorageHandler") && !status
+            .getPath().getName().endsWith(".carbondata")) {
+          continue;
+        }
         tableSize += status.getLen();
         numFiles += 1;
       }

@@ -519,6 +519,10 @@ public final class HiveFileFormatUtils {
     public void abortTask(TaskAttemptContext taskContext) { }
   }
 
+  public static void prepareJobOutput(JobConf conf) {
+    prepareJobOutput(conf, NullOutputCommitter.class);
+  }
+
   /**
    * Hive uses side effect files exclusively for it's output. It also manages
    * the setup/cleanup/commit of output from the hive client. As a result it does
@@ -527,8 +531,9 @@ public final class HiveFileFormatUtils {
    * This routine sets the appropriate options related to bypass setup/cleanup/commit
    * support in the MR framework, but does not set the OutputFormat class.
    */
-  public static void prepareJobOutput(JobConf conf) {
-    conf.setOutputCommitter(NullOutputCommitter.class);
+  public static void prepareJobOutput(JobConf conf,
+      Class<? extends OutputCommitter> committerClass) {
+    conf.setOutputCommitter(committerClass);
 
     // option to bypass job setup and cleanup was introduced in hadoop-21 (MAPREDUCE-463)
     // but can be backported. So we disable setup/cleanup in all versions >= 0.19

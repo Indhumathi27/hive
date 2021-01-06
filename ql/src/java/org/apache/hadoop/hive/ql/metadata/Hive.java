@@ -2119,14 +2119,18 @@ private void constructOneLBLocationMap(FileStatus fSta,
    * @return Set of valid partitions
    * @throws HiveException
    */
-  private Set<Path> getValidPartitionsInPath(
-      int numDP, int numLB, Path loadPath, Long writeId, int stmtId,
-      boolean isMmTable, boolean isInsertOverwrite) throws HiveException {
+  private Set<Path> getValidPartitionsInPath(int numDP, int numLB, Path loadPath, Long writeId,
+      int stmtId, boolean isMmTable, boolean isInsertOverwrite, boolean isNonNativeTable)
+      throws HiveException {
     Set<Path> validPartitions = new HashSet<Path>();
     try {
       FileSystem fs = loadPath.getFileSystem(conf);
       if (!isMmTable) {
-        List<FileStatus> leafStatus = HiveStatsUtils.getFileStatusRecurse(loadPath, numDP, fs);
+        PathFilter pathFilter = isNonNativeTable ?
+            FileUtils.FILTER_PARTITION_FOLDERS :
+            FileUtils.HIDDEN_FILES_PATH_FILTER;
+        List<FileStatus> leafStatus =
+            HiveStatsUtils.getFileStatusRecurse(loadPath, numDP, fs, pathFilter);
         // Check for empty partitions
         for (FileStatus s : leafStatus) {
           if (!s.isDirectory()) {
@@ -2204,8 +2208,10 @@ private void constructOneLBLocationMap(FileStatus fSta,
 
     // Get all valid partition paths and existing partitions for them (if any)
     final Table tbl = getTable(tableName);
-    final Set<Path> validPartitions = getValidPartitionsInPath(numDP, numLB, loadPath, writeId, stmtId,
-        AcidUtils.isInsertOnlyTable(tbl.getParameters()), isInsertOverwrite);
+    boolean isNonNativeTable = tbl.isNonNative();
+    final Set<Path> validPartitions =
+        getValidPartitionsInPath(numDP, numLB, loadPath, writeId, stmtId,
+            AcidUtils.isInsertOnlyTable(tbl.getParameters()), isInsertOverwrite, isNonNativeTable);
 
     final int partsToLoad = validPartitions.size();
     final AtomicInteger partitionsLoaded = new AtomicInteger(0);
@@ -2358,6 +2364,11 @@ private void constructOneLBLocationMap(FileStatus fSta,
       // Either a non-MM query, or a load into MM table from an external source.
       Path tblPath = tbl.getPath();
       Path destPath = tblPath;
+      if (null != tbl.getStorageHandler() && tbl.getStorageHandler().getInputFormatClass().getName()
+          .equalsIgnoreCase("org.apache.carbondata.hive.MapredCarbonOutputFormat") && tbl.getPath()
+          .equals(destPath)) {
+        return;
+      }
       if (isMmTable) {
         assert !isAcidIUDoperation;
         // We will load into MM directory, and hide previous directories if needed.
@@ -3365,7 +3376,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
       FileStatus[] files;
       if (src.isDirectory()) {
         try {
-          files = srcFs.listStatus(src.getPath(), FileUtils.HIDDEN_FILES_PATH_FILTER);
+          files = srcFs.listStatus(src.getPath(), FileUtils.HIDDEN_AND_CARBON_PATH_FILTER);
         } catch (IOException e) {
           pool.shutdownNow();
           throw new HiveException(e);
@@ -3573,7 +3584,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
         parent = parent.getParent();
       }
       FileStatus[] existingFiles = destFS.listStatus(
-          dest, FileUtils.HIDDEN_FILES_PATH_FILTER);
+          dest, FileUtils.HIDDEN_AND_CARBON_PATH_FILTER);
       for (FileStatus fileStatus : existingFiles) {
         if (!fileStatus.getPath().getName().equals(parent.getName())) {
           destFS.delete(fileStatus.getPath(), true);
@@ -3694,6 +3705,12 @@ private void constructOneLBLocationMap(FileStatus fSta,
             }
             /* Move files one by one because source is a subdirectory of destination */
             for (final FileStatus srcStatus : srcs) {
+              // In case the directory to be moved is empty, no need to copy.
+              if ((srcStatus.isDirectory() && !destFs.listFiles(srcStatus.getPath(), false).hasNext())
+                  || srcStatus.getPath().toString().endsWith(".carbondata") || srcStatus.getPath().toString()
+                  .endsWith(".carbonindex")) {
+                continue;
+              }
 
               final Path destFile = new Path(destf, srcStatus.getPath().getName());
 

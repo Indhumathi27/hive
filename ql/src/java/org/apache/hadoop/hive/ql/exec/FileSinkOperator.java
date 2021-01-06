@@ -340,6 +340,11 @@ public class FileSinkOperator extends TerminalOperator<FileSinkDesc> implements
             LOG.info("Writing to temp file: FS " + outPaths[filesIdx]);
           }
         }
+      } else if (conf.getTableInfo().getOutputFileFormatClassName()
+          .contains("MapredCarbonOutputFormat")) {
+        this.finalPaths[filesIdx] = this.outPaths[filesIdx] = this.subdirBeforeTxn != null ?
+            new Path(FileSinkOperator.this.destTablePath.toString(), this.subdirBeforeTxn) :
+            FileSinkOperator.this.specPath;
       } else {
         finalPaths[filesIdx] = outPaths[filesIdx] = specPath;
       }

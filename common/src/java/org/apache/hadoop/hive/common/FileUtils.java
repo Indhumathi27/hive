@@ -81,6 +81,24 @@ public final class FileUtils {
     }
   };
 
+  public static final PathFilter HIDDEN_AND_CARBON_PATH_FILTER = new PathFilter() {
+    @Override
+    public boolean accept(Path p) {
+      String name = p.getName();
+      return !name.startsWith("_") && !name.startsWith(".") && !name.contains("Fact") && !name
+          .contains("Metadata") && !name.contains("schema") && !name.contains("LockFiles") && !name
+          .contains("=") && !name.contains(".segment") && !name.contains(".carbondata") && !name
+          .contains(".carbonindex");
+    }
+  };
+
+  public static final PathFilter FILTER_PARTITION_FOLDERS = new PathFilter() {
+    @Override
+    public boolean accept(Path p) {
+      return p.toString().contains("=");
+    }
+  };
+
   public static final PathFilter STAGING_DIR_PATH_FILTER = new PathFilter() {
     @Override
     public boolean accept(Path p) {

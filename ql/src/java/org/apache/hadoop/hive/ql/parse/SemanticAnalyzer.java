@@ -7300,7 +7300,8 @@ public class SemanticAnalyzer extends BaseSemanticAnalyzer {
 
       // Create the work for moving the table
       // NOTE: specify Dynamic partitions in dest_tab for WriteEntity
-      if (!isNonNativeTable) {
+      boolean isCarbonLoad = table_desc.getOutputFileFormatClassName().contains("Carbon");
+      if (!isNonNativeTable || isCarbonLoad) {
         AcidUtils.Operation acidOp = AcidUtils.Operation.NOT_ACID;
         if (destTableIsFullAcid) {
           acidOp = getAcidType(table_desc.getOutputFileFormatClass(), dest);

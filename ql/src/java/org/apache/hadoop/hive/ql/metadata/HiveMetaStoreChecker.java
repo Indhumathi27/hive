@@ -349,7 +349,7 @@ public class HiveMetaStoreChecker {
           partPath, partColNames);
       LOG.debug("PartitionName: " + partitionName);
 
-      if (partitionName != null) {
+      if (partitionName != null && partitionName.contains("=")) {
         PartitionResult pr = new PartitionResult();
         pr.setPartitionName(partitionName);
         pr.setTableName(table.getTableName());

@@ -33,8 +33,11 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.hadoop.hive.ql.exec.FileSinkOperator;
 import org.apache.hadoop.hive.ql.exec.SerializationUtilities;
 import org.apache.hadoop.hive.ql.log.LogDivertAppenderForTest;
+import org.apache.hadoop.hive.ql.metadata.Table;
+import org.apache.hadoop.mapred.OutputCommitter;
 import org.apache.hadoop.mapreduce.MRJobConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -260,7 +263,26 @@ public class ExecDriver extends Task<MapredWork> implements Serializable, Hadoop
       return 5;
     }
 
+    Iterator<FileSinkOperator> fileSinkOperator =
+        OperatorUtils.findOperators(work.getAllOperators(), FileSinkOperator.class).iterator();
+    if (ctx.getCmd().startsWith("insert") && fileSinkOperator.hasNext()) {
+      Table table = fileSinkOperator.next().getConf().getTable();
+      if (table != null && table.getOutputFormatClass() != null && table.getOutputFormatClass()
+          .getName().equals("org.apache.carbondata.hive.MapredCarbonOutputFormat")) {
+        try {
+          HiveFileFormatUtils.prepareJobOutput(job, (Class<OutputCommitter>) Class
+              .forName("org.apache.carbondata.hive.MapredCarbonOutputCommitter"));
+        } catch (Exception e) {
+          e.printStackTrace();
+          console.printError("Error launching map-reduce job",
+              "\n" + org.apache.hadoop.util.StringUtils.stringifyException(e));
+        }
+    } else {
+      HiveFileFormatUtils.prepareJobOutput(job);
+    }
+  } else {
     HiveFileFormatUtils.prepareJobOutput(job);
+  }
     //See the javadoc on HiveOutputFormatImpl and HadoopShims.prepareJobOutput()
     job.setOutputFormat(HiveOutputFormatImpl.class);
 
