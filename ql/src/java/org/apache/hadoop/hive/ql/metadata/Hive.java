@@ -1800,6 +1800,9 @@ public class Hive {
         }
 
         boolean isManaged = tbl.getTableType() == TableType.MANAGED_TABLE;
+        String storage_handler = tbl.getTTable().getParameters().get(META_TABLE_STORAGE);
+        boolean isCarbonTable =
+            null != storage_handler && storage_handler.contains("CarbonStorageHandler");
         // TODO: why is "&& !isAcidIUDoperation" needed here?
         if (!isTxnTable && ((loadFileType == LoadFileType.REPLACE_ALL) || (oldPart == null && !isAcidIUDoperation))) {
           //for fullAcid tables we don't delete files for commands with OVERWRITE - we create a new
@@ -1808,12 +1811,13 @@ public class Hive {
           boolean needRecycle = !tbl.isTemporary()
                   && ReplChangeManager.isSourceOfReplication(Hive.get().getDatabase(tbl.getDbName()));
           replaceFiles(tbl.getPath(), loadPath, destPath, oldPartPath, getConf(), isSrcLocal,
-              isAutoPurge, newFiles, FileUtils.HIDDEN_FILES_PATH_FILTER, needRecycle, isManaged);
+              isAutoPurge, newFiles, FileUtils.HIDDEN_FILES_PATH_FILTER, needRecycle, isManaged,
+              isCarbonTable);
         } else {
           FileSystem fs = tbl.getDataLocation().getFileSystem(conf);
           copyFiles(conf, loadPath, destPath, fs, isSrcLocal, isAcidIUDoperation,
-              (loadFileType == LoadFileType.OVERWRITE_EXISTING), newFiles,
-              tbl.getNumBuckets() > 0, isFullAcidTable, isManaged);
+              (loadFileType == LoadFileType.OVERWRITE_EXISTING), newFiles, tbl.getNumBuckets() > 0,
+              isFullAcidTable, isManaged, isCarbonTable);
         }
       }
       perfLogger.PerfLogEnd("MoveTask", "FileMoves");
@@ -2382,6 +2386,9 @@ private void constructOneLBLocationMap(FileStatus fSta,
           + " (replace = " + loadFileType + ")");
 
       boolean isManaged = tbl.getTableType() == TableType.MANAGED_TABLE;
+      String storage_handler = tbl.getTTable().getParameters().get(META_TABLE_STORAGE);
+      boolean isCarbonTable =
+          null != storage_handler && storage_handler.contains("CarbonStorageHandler");
 
       if (loadFileType == LoadFileType.REPLACE_ALL && !isTxnTable) {
         //for fullAcid we don't want to delete any files even for OVERWRITE see HIVE-14988/HIVE-17361
@@ -2389,13 +2396,13 @@ private void constructOneLBLocationMap(FileStatus fSta,
         boolean needRecycle = !tbl.isTemporary()
                 && ReplChangeManager.isSourceOfReplication(Hive.get().getDatabase(tbl.getDbName()));
         replaceFiles(tblPath, loadPath, destPath, tblPath, conf, isSrcLocal, isAutopurge,
-            newFiles, FileUtils.HIDDEN_FILES_PATH_FILTER, needRecycle, isManaged);
+            newFiles, FileUtils.HIDDEN_FILES_PATH_FILTER, needRecycle, isManaged, isCarbonTable);
       } else {
         try {
           FileSystem fs = tbl.getDataLocation().getFileSystem(conf);
           copyFiles(conf, loadPath, destPath, fs, isSrcLocal, isAcidIUDoperation,
               loadFileType == LoadFileType.OVERWRITE_EXISTING, newFiles,
-              tbl.getNumBuckets() > 0, isFullAcidTable, isManaged);
+              tbl.getNumBuckets() > 0, isFullAcidTable, isManaged, isCarbonTable);
         } catch (IOException e) {
           throw new HiveException("addFiles: filesystem error in check phase", e);
         }
@@ -3349,7 +3356,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
   private static void copyFiles(final HiveConf conf, final FileSystem destFs,
             FileStatus[] srcs, final FileSystem srcFs, final Path destf,
             final boolean isSrcLocal, boolean isOverwrite,
-            final List<Path> newFiles, boolean acidRename, boolean isManaged) throws HiveException {
+            final List<Path> newFiles, boolean acidRename, boolean isManaged, boolean isCarbonTable) throws HiveException {
 
     final HdfsUtils.HadoopFileStatus fullDestStatus;
     try {
@@ -3376,7 +3383,10 @@ private void constructOneLBLocationMap(FileStatus fSta,
       FileStatus[] files;
       if (src.isDirectory()) {
         try {
-          files = srcFs.listStatus(src.getPath(), FileUtils.HIDDEN_AND_CARBON_PATH_FILTER);
+          PathFilter pathFilter = isCarbonTable ?
+              FileUtils.HIDDEN_AND_CARBON_PATH_FILTER :
+              FileUtils.HIDDEN_FILES_PATH_FILTER;
+          files = srcFs.listStatus(src.getPath(), pathFilter);
         } catch (IOException e) {
           pool.shutdownNow();
           throw new HiveException(e);
@@ -3632,7 +3642,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
   //from mv command if the destf is a directory, it replaces the destf instead of moving under
   //the destf. in this case, the replaced destf still preserves the original destf's permission
   public static boolean moveFile(final HiveConf conf, Path srcf, final Path destf, boolean replace,
-                                 boolean isSrcLocal, boolean isManaged) throws HiveException {
+      boolean isSrcLocal, boolean isManaged, boolean isCarbonTable) throws HiveException {
     final FileSystem srcFs, destFs;
     try {
       destFs = destf.getFileSystem(conf);
@@ -3706,9 +3716,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
             /* Move files one by one because source is a subdirectory of destination */
             for (final FileStatus srcStatus : srcs) {
               // In case the directory to be moved is empty, no need to copy.
-              if ((srcStatus.isDirectory() && !destFs.listFiles(srcStatus.getPath(), false).hasNext())
-                  || srcStatus.getPath().toString().endsWith(".carbondata") || srcStatus.getPath().toString()
-                  .endsWith(".carbonindex")) {
+              if (isCarbonTable) {
                 continue;
               }
 
@@ -3891,6 +3899,14 @@ private void constructOneLBLocationMap(FileStatus fSta,
     }
   }
 
+  static protected void copyFiles(HiveConf conf, Path srcf, Path destf, FileSystem fs,
+      boolean isSrcLocal, boolean isAcidIUD,
+      boolean isOverwrite, List<Path> newFiles, boolean isBucketed,
+      boolean isFullAcidTable, boolean isManaged) throws HiveException {
+    copyFiles(conf, srcf, destf, fs, isSrcLocal, isAcidIUD, isOverwrite, newFiles, isBucketed,
+        isFullAcidTable, isManaged, false);
+  }
+
   /**
    * Copy files.  This handles building the mapping for buckets and such between the source and
    * destination
@@ -3907,9 +3923,9 @@ private void constructOneLBLocationMap(FileStatus fSta,
    * @throws HiveException
    */
   static protected void copyFiles(HiveConf conf, Path srcf, Path destf, FileSystem fs,
-                                  boolean isSrcLocal, boolean isAcidIUD,
-                                  boolean isOverwrite, List<Path> newFiles, boolean isBucketed,
-                                  boolean isFullAcidTable, boolean isManaged) throws HiveException {
+      boolean isSrcLocal, boolean isAcidIUD, boolean isOverwrite, List<Path> newFiles,
+      boolean isBucketed, boolean isFullAcidTable, boolean isManaged, boolean isCarbonTable)
+      throws HiveException {
     try {
       // create the destination if it does not exist
       if (!fs.exists(destf)) {
@@ -3945,7 +3961,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
       // i.e, like 000000_0, 000001_0_copy_1, 000002_0.gz etc.
       // The extension is only maintained for files which are compressed.
       copyFiles(conf, fs, srcs, srcFs, destf, isSrcLocal, isOverwrite,
-              newFiles, isFullAcidTable && !isBucketed, isManaged);
+              newFiles, isFullAcidTable && !isBucketed, isManaged, isCarbonTable);
     }
   }
 
@@ -4106,7 +4122,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
    */
   protected void replaceFiles(Path tablePath, Path srcf, Path destf, Path oldPath, HiveConf conf,
           boolean isSrcLocal, boolean purge, List<Path> newFiles, PathFilter deletePathFilter,
-          boolean isNeedRecycle, boolean isManaged) throws HiveException {
+          boolean isNeedRecycle, boolean isManaged, boolean isCarbonTable) throws HiveException {
     try {
 
       FileSystem destFs = destf.getFileSystem(conf);
@@ -4143,7 +4159,7 @@ private void constructOneLBLocationMap(FileStatus fSta,
       // 2. srcs must be a list of files -- ensured by LoadSemanticAnalyzer
       // in both cases, we move the file under destf
       if (srcs.length == 1 && srcs[0].isDirectory()) {
-        if (!moveFile(conf, srcs[0].getPath(), destf, true, isSrcLocal, isManaged)) {
+        if (!moveFile(conf, srcs[0].getPath(), destf, true, isSrcLocal, isManaged, isCarbonTable)) {
           throw new IOException("Error moving: " + srcf + " into: " + destf);
         }
 
@@ -4155,7 +4171,8 @@ private void constructOneLBLocationMap(FileStatus fSta,
         // its either a file or glob
         for (FileStatus src : srcs) {
           Path destFile = new Path(destf, src.getPath().getName());
-          if (!moveFile(conf, src.getPath(), destFile, true, isSrcLocal, isManaged)) {
+          if (!moveFile(conf, src.getPath(), destFile, true, isSrcLocal, isManaged,
+              isCarbonTable)) {
             throw new IOException("Error moving: " + srcf + " into: " + destf);
           }
 

@@ -84,11 +84,10 @@ public final class FileUtils {
   public static final PathFilter HIDDEN_AND_CARBON_PATH_FILTER = new PathFilter() {
     @Override
     public boolean accept(Path p) {
+      String path = p.toString();
       String name = p.getName();
-      return !name.startsWith("_") && !name.startsWith(".") && !name.contains("Fact") && !name
-          .contains("Metadata") && !name.contains("schema") && !name.contains("LockFiles") && !name
-          .contains("=") && !name.contains(".segment") && !name.contains(".carbondata") && !name
-          .contains(".carbonindex");
+      return !name.startsWith("_") && !name.startsWith(".") && !path.contains("=") && !path
+          .contains("Fact") && !path.contains("Metadata") && !path.contains("LockFiles");
     }
   };
 
