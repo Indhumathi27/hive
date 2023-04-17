@@ -54,12 +54,12 @@
     <module>llap-tez</module>
     <module>llap-server</module>
     <module>shims</module>
-    <module>kudu-handler</module>
+<!--    <module>kudu-handler</module>-->
     <module>testutils</module>
     <module>packaging</module>
     <module>standalone-metastore</module>
-    <module>upgrade-acid</module>
-    <module>kafka-handler</module>
+<!--    <module>upgrade-acid</module>-->
+<!--    <module>kafka-handler</module>-->
   </modules>
   <properties>
     <standalone-metastore.version>4.0.0-beta-2-SNAPSHOT</standalone-metastore.version>
@@ -308,6 +308,11 @@
         <version>${protobuf.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-text</artifactId>
+        <version>1.10.0</version>
+      </dependency>
+      <dependency>
         <groupId>com.google.code.tempus-fugit</groupId>
         <artifactId>tempus-fugit</artifactId>
         <version>${tempus-fugit.version}</version>
@@ -508,26 +513,56 @@
         <groupId>org.apache.accumulo</groupId>
         <artifactId>accumulo-core</artifactId>
         <version>${accumulo.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.accumulo</groupId>
         <artifactId>accumulo-fate</artifactId>
         <version>${accumulo.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.accumulo</groupId>
         <artifactId>accumulo-minicluster</artifactId>
         <version>${accumulo.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.accumulo</groupId>
         <artifactId>accumulo-start</artifactId>
         <version>${accumulo.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.accumulo</groupId>
         <artifactId>accumulo-trace</artifactId>
         <version>${accumulo.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.calcite.avatica</groupId>
@@ -2033,26 +2068,6 @@
           <name>hbase.version</name>
         </property>
       </activation>
-    </profile>
-    <profile>
-      <id>dist</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.cyclonedx</groupId>
-            <artifactId>cyclonedx-maven-plugin</artifactId>
-            <version>${maven.cyclonedx.plugin.version}</version>
-            <executions>
-              <execution>
-                <phase>package</phase>
-                <goals>
-                  <goal>makeBom</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
   </profiles>
 </project>

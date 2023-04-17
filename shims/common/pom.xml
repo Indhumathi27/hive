@@ -59,6 +59,10 @@
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -76,6 +80,10 @@
         <exclusion>
           <groupId>org.apache.hadoop</groupId>
           <artifactId>hadoop-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

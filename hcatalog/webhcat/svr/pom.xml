@@ -39,6 +39,12 @@
       <artifactId>hive-hcatalog-core</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <!-- inter-project -->
     <dependency>
@@ -61,6 +67,10 @@
           <groupId>javax.ws.rs</groupId>
           <artifactId>jsr311-api</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -70,6 +80,10 @@
         <exclusion>
           <groupId>com.sun.jersey</groupId>
           <artifactId>jersey-server</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -81,6 +95,10 @@
           <groupId>com.sun.jersey</groupId>
           <artifactId>jersey-server</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -90,6 +108,10 @@
         <exclusion>
           <groupId>com.sun.jersey</groupId>
           <artifactId>jersey-server</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -104,6 +126,12 @@
     <dependency>
       <groupId>org.apache.zookeeper</groupId>
       <artifactId>zookeeper</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -126,6 +154,12 @@
       <groupId>org.apache.hive</groupId>
       <artifactId>hive-jdbc</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.hadoop</groupId>
@@ -147,6 +181,10 @@
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -165,6 +203,10 @@
           <groupId>org.eclipse.jetty</groupId>
           <artifactId>jetty-util</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -179,11 +221,21 @@
           <groupId>org.eclipse.jetty</groupId>
           <artifactId>jetty-util</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-mapreduce-client-core</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>javax.ws.rs</groupId>
@@ -197,6 +249,12 @@
       <version>${standalone-metastore.version}</version>
       <classifier>tests</classifier>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.hive</groupId>
@@ -204,6 +262,12 @@
       <version>${standalone-metastore.version}</version>
       <classifier>tests</classifier>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

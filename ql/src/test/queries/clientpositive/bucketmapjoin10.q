@@ -14,7 +14,7 @@ LOAD DATA LOCAL INPATH '../../data/files/bmj/000000_0' INTO TABLE srcbucket_mapj
 LOAD DATA LOCAL INPATH '../../data/files/bmj/000001_0' INTO TABLE srcbucket_mapjoin_part_1_n6 PARTITION (part='2');
 LOAD DATA LOCAL INPATH '../../data/files/bmj/000002_0' INTO TABLE srcbucket_mapjoin_part_1_n6 PARTITION (part='2');
 
-CREATE TABLE srcbucket_mapjoin_part_2_n13 (key INT, value STRING) PARTITIONED BY (part STRING) 
+CREATE TABLE srcbucket_mapjoin_part_2_n13 (key INT, value STRING) PARTITIONED BY (part STRING)
 CLUSTERED BY (key) INTO 3 BUCKETS STORED AS TEXTFILE;
 LOAD DATA LOCAL INPATH '../../data/files/bmj/000000_0' INTO TABLE srcbucket_mapjoin_part_2_n13 PARTITION (part='1');
 LOAD DATA LOCAL INPATH '../../data/files/bmj/000001_0' INTO TABLE srcbucket_mapjoin_part_2_n13 PARTITION (part='1');

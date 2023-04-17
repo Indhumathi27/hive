@@ -19,9 +19,9 @@ select * from b_n1 intersect all select * from a_n1 intersect select * from b_n1
 
 (select * from b_n1) intersect all ((select * from a_n1) intersect select * from b_n1);
 
-select * from (select a_n1.key, b_n1.value from a_n1 join b_n1 on a_n1.key=b_n1.key)sub1 
-intersect 
-select * from (select a_n1.key, b_n1.value from a_n1 join b_n1 on a_n1.key=b_n1.key)sub2; 
+select * from (select a_n1.key, b_n1.value from a_n1 join b_n1 on a_n1.key=b_n1.key)sub1
+intersect
+select * from (select a_n1.key, b_n1.value from a_n1 join b_n1 on a_n1.key=b_n1.key)sub2;
 
 drop table a_n1;
 

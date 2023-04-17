@@ -29,6 +29,12 @@
       <groupId>org.apache.hive</groupId>
       <artifactId>hive-standalone-metastore-common</artifactId>
       <version>4.0.0-beta-2-SNAPSHOT</version>
+      <exclusions>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.hive</groupId>
@@ -41,6 +47,12 @@
       <artifactId>httpclient</artifactId>
       <version>${httpcomponents.client.version}</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.orc</groupId>
@@ -54,6 +66,10 @@
           <groupId>org.apache.hive</groupId>
           <artifactId>hive-storage-api</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -63,6 +79,10 @@
         <exclusion>
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-simple</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -143,12 +163,22 @@
           <groupId>org.apache.curator</groupId>
           <artifactId>curator-framework</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-distcp</artifactId>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.hadoop</groupId>
@@ -175,6 +205,10 @@
           <groupId>io.netty</groupId>
           <artifactId>*</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -198,6 +232,10 @@
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -220,6 +258,10 @@
         <exclusion>
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -247,6 +289,12 @@
       <groupId>org.apache.hive</groupId>
       <artifactId>hive-storage-api</artifactId>
       <version>${storage-api.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
@@ -272,18 +320,42 @@
     <dependency>
       <groupId>org.datanucleus</groupId>
       <artifactId>datanucleus-api-jdo</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.datanucleus</groupId>
       <artifactId>datanucleus-core</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.datanucleus</groupId>
       <artifactId>datanucleus-rdbms</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.datanucleus</groupId>
       <artifactId>javax.jdo</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.skyscreamer</groupId>
@@ -720,6 +792,13 @@
         <groupId>org.datanucleus</groupId>
         <artifactId>datanucleus-maven-plugin</artifactId>
         <version>5.2.1</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-container-default</artifactId>
+            <version>1.5.6</version>
+          </dependency>
+        </dependencies>
         <configuration>
           <api>JDO</api>
           <verbose>false</verbose>

@@ -38,6 +38,10 @@
           <groupId>org.eclipse.jetty.aggregate</groupId>
           <artifactId>jetty-all</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <!-- inter-project -->
@@ -61,6 +65,12 @@
       <groupId>org.apache.hive</groupId>
       <artifactId>hive-serde</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>log4j</groupId>
+          <artifactId>log4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
   <build>
