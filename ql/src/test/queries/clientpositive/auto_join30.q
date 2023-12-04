@@ -1,153 +1,19 @@
---! qt:dataset:src
-set hive.explain.user=false;
 set hive.auto.convert.join = true;
+set hive.compute.query.using.stats=false;
+set hive.stats.fetch.column.stats=false;
+set hive.cbo.enable=false;
+set hive.stats.autogather=false;
+set hive.stats.column.autogather=false;
+set hive.vectorized.execution.enabled=false;
 
-explain
-FROM 
-(SELECT src.* FROM src sort by key) x
-JOIN
-(SELECT src.* FROM src sort by value) Y
-ON (x.key = Y.key)
-select sum(hash(Y.key,Y.value));
+set hive.stats.estimate=false;
+create table t_1(a int, b int);
+insert into t_1 select 1,2;
+insert into t_1 select 1,2;
+insert into t_1 select 3,4;
 
-FROM 
-(SELECT src.* FROM src sort by key) x
-JOIN 
-(SELECT src.* FROM src sort by value) Y
-ON (x.key = Y.key)
-select sum(hash(Y.key,Y.value));
+select * from t_1 t1 join t_1 t2 on(t1.a=t2.a);
 
-explain
-FROM 
-(SELECT src.* FROM src sort by key) x
-LEFT OUTER JOIN
-(SELECT src.* FROM src sort by value) Y
-ON (x.key = Y.key)
-select sum(hash(Y.key,Y.value));
+set hive.stats.estimate=true;
 
-FROM 
-(SELECT src.* FROM src sort by key) x
-LEFT OUTER JOIN 
-(SELECT src.* FROM src sort by value) Y
-ON (x.key = Y.key)
-select sum(hash(Y.key,Y.value));
-
-explain
-FROM 
-(SELECT src.* FROM src sort by key) x
-RIGHT OUTER JOIN
-(SELECT src.* FROM src sort by value) Y
-ON (x.key = Y.key)
-select sum(hash(Y.key,Y.value));
-
-FROM 
-(SELECT src.* FROM src sort by key) x
-RIGHT OUTER JOIN 
-(SELECT src.* FROM src sort by value) Y
-ON (x.key = Y.key)
-select sum(hash(Y.key,Y.value));
-
-explain
-FROM 
-(SELECT src.* FROM src sort by key) x
-JOIN
-(SELECT src.* FROM src sort by value) Y
-ON (x.key = Y.key)
-JOIN
-(SELECT src.* FROM src sort by value) Z
-ON (x.key = Z.key)
-select sum(hash(Y.key,Y.value));
-
-FROM
-(SELECT src.* FROM src sort by key) x
-JOIN
-(SELECT src.* FROM src sort by value) Y
-ON (x.key = Y.key)
-JOIN
-(SELECT src.* FROM src sort by value) Z
-ON (x.key = Z.key)
-select sum(hash(Y.key,Y.value));
-
-explain
-FROM 
-(SELECT src.* FROM src sort by key) x
-JOIN
-(SELECT src.* FROM src sort by value) Y
-ON (x.key = Y.key)
-LEFT OUTER JOIN
-(SELECT src.* FROM src sort by value) Z
-ON (x.key = Z.key)
-select sum(hash(Y.key,Y.value));
-
-FROM
-(SELECT src.* FROM src sort by key) x
-JOIN
-(SELECT src.* FROM src sort by value) Y
-ON (x.key = Y.key)
-LEFT OUTER JOIN
-(SELECT src.* FROM src sort by value) Z
-ON (x.key = Z.key)
-select sum(hash(Y.key,Y.value));
-
-explain
-FROM 
-(SELECT src.* FROM src sort by key) x
-LEFT OUTER JOIN
-(SELECT src.* FROM src sort by value) Y
-ON (x.key = Y.key)
-LEFT OUTER JOIN
-(SELECT src.* FROM src sort by value) Z
-ON (x.key = Z.key)
-select sum(hash(Y.key,Y.value));
-
-FROM
-(SELECT src.* FROM src sort by key) x
-LEFT OUTER JOIN
-(SELECT src.* FROM src sort by value) Y
-ON (x.key = Y.key)
-LEFT OUTER JOIN
-(SELECT src.* FROM src sort by value) Z
-ON (x.key = Z.key)
-select sum(hash(Y.key,Y.value));
-
-explain
-FROM 
-(SELECT src.* FROM src sort by key) x
-LEFT OUTER JOIN
-(SELECT src.* FROM src sort by value) Y
-ON (x.key = Y.key)
-RIGHT OUTER JOIN
-(SELECT src.* FROM src sort by value) Z
-ON (x.key = Z.key)
-select sum(hash(Y.key,Y.value));
-
-FROM
-(SELECT src.* FROM src sort by key) x
-LEFT OUTER JOIN
-(SELECT src.* FROM src sort by value) Y
-ON (x.key = Y.key)
-RIGHT OUTER JOIN
-(SELECT src.* FROM src sort by value) Z
-ON (x.key = Z.key)
-select sum(hash(Y.key,Y.value));
-
-explain
-FROM 
-(SELECT src.* FROM src sort by key) x
-RIGHT OUTER JOIN
-(SELECT src.* FROM src sort by value) Y
-ON (x.key = Y.key)
-RIGHT OUTER JOIN
-(SELECT src.* FROM src sort by value) Z
-ON (x.key = Z.key)
-select sum(hash(Y.key,Y.value));
-
-FROM
-(SELECT src.* FROM src sort by key) x
-RIGHT OUTER JOIN
-(SELECT src.* FROM src sort by value) Y
-ON (x.key = Y.key)
-RIGHT OUTER JOIN
-(SELECT src.* FROM src sort by value) Z
-ON (x.key = Z.key)
-select sum(hash(Y.key,Y.value));
+explain select * from t_1 t1 join t_1 t2 on(t1.a=t2.a);

@@ -1,29 +1,19 @@
-set fs.default.name=invalidscheme:///;
+set hive.auto.convert.join = true;
+set hive.compute.query.using.stats=false;
+set hive.stats.fetch.column.stats=false;
+set hive.cbo.enable=false;
+set hive.stats.autogather=false;
+set hive.stats.column.autogather=false;
+set hive.vectorized.execution.enabled=false;
 
-CREATE TABLE table1_n5 (a STRING, b STRING) STORED AS TEXTFILE;
-DESCRIBE table1_n5;
-DESCRIBE EXTENDED table1_n5;
+set hive.stats.estimate=false;
+create table t_1(a int, b int);
+insert into t_1 select 1,2;
+insert into t_1 select 1,2;
+insert into t_1 select 3,4;
 
-CREATE TABLE IF NOT EXISTS table1_n5 (a STRING, b STRING) STORED AS TEXTFILE;
+select * from t_2 t1 join t_2 t2 on(t1.a=t2.a);
 
-CREATE TABLE IF NOT EXISTS table2_n2 (a STRING, b INT) STORED AS TEXTFILE;
-DESCRIBE table2_n2;
-DESCRIBE EXTENDED table2_n2;
+set hive.stats.estimate=true;
 
-CREATE TABLE table3 (a STRING, b STRING)
-ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
-STORED AS TEXTFILE;
-DESCRIBE table3;
-DESCRIBE EXTENDED table3;
-
-CREATE TABLE table4 (a STRING, b STRING)
-ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
-STORED AS SEQUENCEFILE;
-DESCRIBE table4;
-DESCRIBE EXTENDED table4;
-
-CREATE TABLE table5_n1 (a STRING, b STRING)
-ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
-STORED AS RCFILE;
-DESCRIBE table5_n1;
-DESCRIBE EXTENDED table5_n1;
+select * from t_1 t1 join t_1 t2 on(t1.a=t2.a);

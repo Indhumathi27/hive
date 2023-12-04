@@ -54,7 +54,7 @@
     <module>llap-tez</module>
     <module>llap-server</module>
     <module>shims</module>
-<!--    <module>kudu-handler</module>-->
+    <module>kudu-handler</module>
     <module>testutils</module>
     <module>packaging</module>
     <module>standalone-metastore</module>
