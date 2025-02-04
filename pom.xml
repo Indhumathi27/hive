@@ -59,7 +59,7 @@
     <module>testutils</module>
     <module>packaging</module>
     <module>standalone-metastore</module>
-    <module>kafka-handler</module>
+<!--    <module>kafka-handler</module>-->
     <module>iceberg</module>
   </modules>
   <properties>
