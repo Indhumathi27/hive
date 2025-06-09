@@ -34,6 +34,7 @@ import java.io.File;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
@@ -158,12 +159,13 @@ public class TestReExecuteKilledTezAMQueryPlugin {
 
     // wait for other thread to create the stmt handle
     int count = 0;
+    YarnClient yarnClient = getYarnClient();
     while (++count <= 10) {
       Thread.sleep(2000);
-      if (stmtQueryId.length() != 0) {
+      if (stmtQueryId.length() != 0 && isQueryRunning(stmtQueryId.toString(), yarnClient, con1)) {
         String queryId = stmtQueryId.toString();
         System.out.println("Killing query: " + queryId);
-        killAMForQueryId(queryId);
+        killAMForQueryId(queryId, yarnClient);
         break;
       }
     }
@@ -179,11 +181,7 @@ public class TestReExecuteKilledTezAMQueryPlugin {
     Assert.assertEquals(originalQExHolder.throwable, null);
   }
 
-  private void killAMForQueryId(String queryId) throws Exception {
-    YarnClient yarnClient = YarnClient.createYarnClient();
-    yarnClient.init(conf);
-    yarnClient.start();
-
+  private void killAMForQueryId(String queryId, YarnClient yarnClient) throws Exception {
     List<ApplicationReport> applicationReports = yarnClient.getApplications();
     String diagnosticsMessage = "AM Container for %s exited with exitCode: -100";
     for (ApplicationReport ar : applicationReports) {
@@ -194,5 +192,39 @@ public class TestReExecuteKilledTezAMQueryPlugin {
         Assert.assertEquals(updated.getYarnApplicationState(), YarnApplicationState.KILLED);
       }
     }
+  }
+
+  private static YarnClient getYarnClient() {
+    YarnClient yarnClient = YarnClient.createYarnClient();
+    yarnClient.init(conf);
+    yarnClient.start();
+    return yarnClient;
+  }
+
+  boolean isQueryRunning(String queryId, YarnClient yarnClient, Connection conn) {
+    boolean yarnRunning = false;
+    boolean hiveRunning = false;
+
+    try {
+      // Check YARN state
+      List<ApplicationReport> applicationReports = yarnClient.getApplications();
+      for (ApplicationReport ar : applicationReports) {
+        if (ar.getApplicationTags().contains(queryId) &&
+                ar.getYarnApplicationState() == YarnApplicationState.RUNNING) {
+          yarnRunning = true;
+          break;
+        }
+      }
+      try (Statement s = conn.createStatement();
+           ResultSet rs = s.executeQuery(
+                   "SELECT STATE FROM SYS.QUERY WHERE QUERY_ID='" + queryId + "'")) {
+        if (rs.next()) {
+          hiveRunning = "RUNNING".equalsIgnoreCase(rs.getString(1));
+        }
+      }
+    } catch (Exception e) {
+      // ignore
+    }
+    return yarnRunning && hiveRunning;
   }
 }
