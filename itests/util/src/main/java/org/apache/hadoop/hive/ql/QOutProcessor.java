@@ -131,7 +131,6 @@ public class QOutProcessor {
       "at org",
       "at sun",
       "at java",
-      "at jdk",
       "at junit",
       "LOCK_QUERYID:",
       "LOCK_TIME:",

@@ -25,13 +25,13 @@ import org.apache.hadoop.hive.llap.metrics.LlapMetricsSystem;
 import org.apache.hadoop.hive.llap.metrics.MetricsUtils;
 import org.apache.hadoop.hive.llap.registry.impl.LlapRegistryService;
 import org.apache.hadoop.metrics2.MetricsSystem;
-import org.apache.hive.common.util.ReflectionUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.internal.util.reflection.Fields;
 import org.mockito.internal.util.reflection.InstanceField;
 
 import java.io.File;
@@ -179,8 +179,10 @@ public class TestLlapDaemon {
   }
 
   static <T> void trySetMock(Object o, Class<T> clazz, T mock) {
-    List<InstanceField> instanceFields = ReflectionUtil.allDeclaredFieldsOf(o).stream()
-        .filter(instanceField -> clazz.isAssignableFrom(instanceField.jdkField().getType())).toList();
+    List<InstanceField> instanceFields = Fields
+        .allDeclaredFieldsOf(o)
+        .filter(instanceField -> !clazz.isAssignableFrom(instanceField.jdkField().getType()))
+        .instanceFields();
     if (instanceFields.size() != 1) {
       throw new RuntimeException("Mocking is only supported, if only one field is assignable from the given class.");
     }

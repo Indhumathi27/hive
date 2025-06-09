@@ -91,9 +91,8 @@ def buildHive(args) {
 set -x
 . /etc/profile.d/confs.sh
 export USER="`whoami`"
-export MAVEN_OPTS="-Xmx4G"
+export MAVEN_OPTS="-Xmx2g"
 export -n HIVE_CONF_DIR
-sw java 17 && . /etc/profile.d/java.sh
 mkdir -p .m2/repository
 cp $SETTINGS .m2/settings.xml
 OPTS=" -s $PWD/.m2/settings.xml -B -Dtest.groups= "
@@ -296,14 +295,12 @@ fi
         stage('init-metastore') {
            withEnv(["dbType=$dbType"]) {
              sh '''#!/bin/bash -e
-             sw java 17 && . /etc/profile.d/java.sh
 set -x
 echo 127.0.0.1 dev_$dbType | sudo tee -a /etc/hosts
 . /etc/profile.d/confs.sh
 sw hive-dev $PWD
 export DOCKER_NETWORK=host
 export DBNAME=metastore
-export HADOOP_CLIENT_OPTS="--add-opens java.base/java.net=ALL-UNNAMED"
 reinit_metastore $dbType
 time docker rm -f dev_$dbType || true
 '''
@@ -406,7 +403,6 @@ tar -xzf packaging/target/apache-hive-*-nightly-*-src.tar.gz
       }
       stage('Generate javadoc') {
           sh """#!/bin/bash -e
-          sw java 17 && . /etc/profile.d/java.sh
 mvn install javadoc:javadoc javadoc:aggregate -DskipTests -pl '!itests/hive-jmh,!itests/util'
 """
       }

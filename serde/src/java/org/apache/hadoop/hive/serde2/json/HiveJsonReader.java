@@ -76,8 +76,7 @@ import com.google.common.base.Preconditions;
  *
  * Support types are:<br>
  * <br>
- * <table border="1">
- *     <caption></caption>
+ * <table border="1" summary="">
  * <tr>
  * <th>JSON Type</th>
  * <th>Java Type</th>

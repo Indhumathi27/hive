@@ -44,7 +44,6 @@ import org.apache.hadoop.hive.metastore.model.MStringList;
 import org.datanucleus.ExecutionContext;
 import org.datanucleus.api.jdo.JDOPersistenceManager;
 import org.datanucleus.metadata.AbstractClassMetaData;
-import org.datanucleus.metadata.AbstractMemberMetaData;
 import org.datanucleus.metadata.IdentityType;
 
 /**
@@ -72,7 +71,7 @@ class DirectSqlInsertPart {
     ExecutionContext ec = ((JDOPersistenceManager) pm).getExecutionContext();
     AbstractClassMetaData cmd = ec.getMetaDataManager().getMetaDataForClass(modelClass, ec.getClassLoaderResolver());
     if (cmd.getIdentityType() == IdentityType.DATASTORE) {
-      return (Long) ec.getStoreManager().getValueGenerationStrategyValue(ec, cmd, null);
+      return (Long) ec.getStoreManager().getValueGenerationStrategyValue(ec, cmd, -1);
     } else {
       throw new MetaException("Identity type is not datastore.");
     }

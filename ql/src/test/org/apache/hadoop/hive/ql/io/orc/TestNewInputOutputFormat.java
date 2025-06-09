@@ -83,7 +83,6 @@ public class TestNewInputOutputFormat {
         + File.separator + "mapred" + File.separator + "staging");
     conf.set("mapred.temp.dir", workDir + File.separator + this.getClass().getSimpleName()
         + File.separator + "mapred" + File.separator + "temp");
-    conf.set("hive.exec.orc.default.compress", "ZLIB");
     localFs = FileSystem.get(conf);
   }
   

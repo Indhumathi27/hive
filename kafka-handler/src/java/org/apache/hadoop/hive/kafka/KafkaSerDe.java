@@ -264,7 +264,7 @@ import java.util.stream.Collectors;
 
   /**
    * Returns a view of input object inspector list between:
-   * <pre>0</pre> inclusive and the specified <pre>toIndex</pre>, exclusive.
+   * <tt>0</tt> inclusive and the specified <tt>toIndex</tt>, exclusive.
    */
   private static final class SubStructObjectInspector extends StructObjectInspector {
 

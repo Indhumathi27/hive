@@ -168,7 +168,7 @@ public final class Decimal128 extends Number implements Comparable<Decimal128> {
   /**
    * Translates a {@code UnsignedInt128} unscaled value, an {@code int} scale,
    * and sign flag into a {@code Decimal128} . The value of the
-   * {@code Decimal128} is <code>(unscaledVal &times; 10 <sup>-scale</sup>)</code>.
+   * {@code Decimal128} is <tt>(unscaledVal &times; 10<sup>-scale</sup>)</tt>.
    *
    * @param unscaledVal
    *          unscaled value of the {@code Decimal128}.

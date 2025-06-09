@@ -22,12 +22,12 @@ import org.apache.hadoop.hive.serde2.typeinfo.TypeInfo;
 
 /**
  * An abstract class to help facilitate existing implementations of
- * <pre>GenericUDAFResolver</pre> to migrate towards the newly introduced
+ * <tt>GenericUDAFResolver</tt> to migrate towards the newly introduced
  * interface {@link GenericUDAFResolver2}. This class provides a default
  * implementation of this new API and in turn calls
  * the existing API {@link GenericUDAFResolver#getEvaluator(TypeInfo[])} by
  * ignoring the extra parameter information available via the
- * <pre>GenericUDAFParameterInfo</pre> interface.
+ * <tt>GenericUDAFParameterInfo</tt> interface.
  *
  */
 @Deprecated

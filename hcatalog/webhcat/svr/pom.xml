@@ -84,14 +84,14 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.glassfish.jersey.ext</groupId>
-      <artifactId>jersey-wadl-doclet</artifactId>
-      <version>${jersey-wadl-doclet.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.glassfish.jaxb</groupId>
-      <artifactId>jaxb-runtime</artifactId>
-      <version>${jaxb-runtime.version}</version>
+      <groupId>com.sun.jersey.contribs</groupId>
+      <artifactId>wadl-resourcedoc-doclet</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>com.sun.jersey</groupId>
+          <artifactId>jersey-server</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -258,21 +258,26 @@
               <encoding>${project.build.sourceEncoding}</encoding>
               <verbose>true</verbose>
               <show>public</show>
-              <doclet>org.glassfish.jersey.wadl.doclet.ResourceDoclet</doclet>
+              <doclet>com.sun.jersey.wadl.resourcedoc.ResourceDoclet</doclet>
               <docletArtifacts>
                 <docletArtifact>
-                  <groupId>org.glassfish.jersey.ext</groupId>
-                  <artifactId>jersey-wadl-doclet</artifactId>
-                  <version>${jersey-wadl-doclet.version}</version>
+                  <groupId>com.sun.jersey.contribs</groupId>
+                  <artifactId>wadl-resourcedoc-doclet</artifactId>
+                  <version>${wadl-resourcedoc-doclet.version}</version>
                 </docletArtifact>
                 <!--
-                    Also specify jaxb-runtime as doclet artifact as the ResourceDoclet
+                    Also specify jersey and xerces as doclet artifacts as the ResourceDoclet
                     uses classes provided by them to generate the resourcedoc.
                  -->
                 <docletArtifact>
-                  <groupId>org.glassfish.jaxb</groupId>
-                  <artifactId>jaxb-runtime</artifactId>
-                  <version>${jaxb-runtime.version}</version>
+                  <groupId>com.sun.jersey</groupId>
+                  <artifactId>jersey-server</artifactId>
+                  <version>${jersey.version}</version>
+                </docletArtifact>
+                <docletArtifact>
+                  <groupId>xerces</groupId>
+                  <artifactId>xercesImpl</artifactId>
+                  <version>${xerces.version}</version>
                 </docletArtifact>
               </docletArtifacts>
               <additionalOptions>
